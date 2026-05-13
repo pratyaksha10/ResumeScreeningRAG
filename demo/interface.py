@@ -28,14 +28,9 @@ load_dotenv()
 DATA_PATH = os.getenv("DATA_PATH")
 FAISS_PATH = os.getenv("FAISS_PATH")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY").strip() if os.getenv("OPENROUTER_API_KEY") else None
-OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL").strip() if os.getenv("OPENROUTER_BASE_URL") else "https://openrouter.ai/api/v1"
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").strip()
 
-if "api_key" not in st.session_state:
-  st.session_state.api_key = OPENROUTER_API_KEY if OPENROUTER_API_KEY else ""
-
-print(DATA_PATH)
-print(FAISS_PATH)
+# Removed debug prints for security
 
 welcome_message = """
   #### Introduction 🚀
@@ -310,10 +305,27 @@ def clear_message():
 
 user_query = st.chat_input("Type your message here...")
 
+# --- API Key Security Logic ---
+# Prioritize server-side environment variable (Streamlit Secrets or .env)
+ENV_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+
+# Only use session state if ENV_API_KEY is missing
+if "api_key" not in st.session_state:
+    st.session_state.api_key = ""
+
+# Determine which key to use for logic (Backend priority)
+active_api_key = ENV_API_KEY if ENV_API_KEY else st.session_state.api_key
+
 with st.sidebar:
   st.markdown("# Control Panel")
 
-  st.text_input("OpenRouter's API Key", type="password", key="api_key", value=st.session_state.api_key)
+  # Only show input field if the key is NOT in the backend environment
+  if not ENV_API_KEY:
+      st.info("🔑 API Key not found in server environment. Please enter it below.")
+      st.text_input("OpenRouter's API Key", type="password", key="api_key")
+  else:
+      st.success("✅ API Key loaded from secure server environment.")
+  
   st.selectbox("RAG Mode", ["Generic RAG", "RAG Fusion"], placeholder="Generic RAG", key="rag_selection")
   st.text_input("Model", "google/gemini-2.0-flash-001", key="gpt_selection")
   st.file_uploader("Upload resumes", type=["csv", "pdf", "xlsx", "xls"], accept_multiple_files=True, key="uploaded_file", on_change=upload_file)
@@ -344,16 +356,16 @@ with tab_chat:
         message[0].render(*message[1:])
 
 
-if not st.session_state.api_key:
+if not active_api_key:
   st.info("Please add your OpenRouter API key to continue. Learn more about [OpenRouter API keys](https://openrouter.ai/keys).")
   st.stop()
 
-is_valid, error_msg = check_openai_api_key(st.session_state.api_key)
+is_valid, error_msg = check_openai_api_key(active_api_key)
 if not is_valid:
   st.error(f"The API key is incorrect or there was a connection issue. Error: {error_msg}")
   st.stop()
 
-if not check_model_name(st.session_state.gpt_selection, st.session_state.api_key):
+if not check_model_name(st.session_state.gpt_selection, active_api_key):
   st.error("The model you specified does not exist. Learn more about [OpenRouter models](https://openrouter.ai/models).")
   st.stop()
 
@@ -361,7 +373,7 @@ if not check_model_name(st.session_state.gpt_selection, st.session_state.api_key
 retriever = st.session_state.rag_pipeline
 
 llm = ChatBot(
-  api_key=st.session_state.api_key,
+  api_key=active_api_key,
   model=st.session_state.gpt_selection,
   base_url=OPENROUTER_BASE_URL
 )
