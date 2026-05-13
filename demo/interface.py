@@ -100,8 +100,87 @@ about_message = """
 """
 
 
-st.set_page_config(page_title="Resume Screening GPT")
-st.title("Resume Screening GPT")
+st.set_page_config(
+    page_title="Anything-RAG | Resume Assistant",
+    page_icon="🚀",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Custom CSS for Mobile & Cross-Browser Optimization
+st.markdown("""
+    <style>
+    /* Global Styles */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Mobile Responsive Padding */
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 1200px;
+    }
+
+    @media (max-width: 768px) {
+        .main .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        h1 {
+            font-size: 1.8rem !important;
+        }
+    }
+
+    /* Custom Button Styling */
+    .stButton>button {
+        width: 100%;
+        border-radius: 8px;
+        height: 3em;
+        background-color: #636EFA;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton>button:hover {
+        background-color: #EF553B;
+        border: none;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Tab Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        white-space: pre-wrap;
+        background-color: #f0f2f6;
+        border-radius: 8px 8px 0px 0px;
+        gap: 1px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background-color: #636EFA !important;
+        color: white !important;
+    }
+
+    /* Hide Streamlit Branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("🚀 Anything-RAG")
+st.caption("Advanced AI Resume Screening Assistant")
 
 if "chat_history" not in st.session_state:
   st.session_state.chat_history = [AIMessage(content=welcome_message)]

@@ -77,4 +77,11 @@ def generate_applicant_graph(document_list):
 def render_graph_in_streamlit(html_path):
     with open(html_path, 'r', encoding='utf-8') as f:
         html_data = f.read()
-    components.html(html_data, height=650)
+    
+    # Wrap in a responsive container
+    responsive_html = f"""
+        <div style="width: 100%; height: 600px; border-radius: 10px; overflow: hidden; border: 1px solid #262730;">
+            {html_data}
+        </div>
+    """
+    components.html(html_data, height=620, scrolling=True)
