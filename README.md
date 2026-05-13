@@ -28,8 +28,8 @@ This application has been significantly upgraded from traditional RAG designs to
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/pratyaksha10/Anything-RAG.git
-cd Anything-RAG
+git clone https://github.com/pratyaksha10/ResumeScreeningRAG.git
+cd ResumeScreeningRAG
 ```
 
 ### 2. Environment Configuration
