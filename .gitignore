@@ -1,0 +1,6 @@
+.env
+vectorstore-synthetic/
+vectorstore-pdf/
+__pycache__/
+*.html
+lib/
